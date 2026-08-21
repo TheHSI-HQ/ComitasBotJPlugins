@@ -1,0 +1,60 @@
+name: Build ComitasBotJ Plugins
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout plugin repository
+        uses: actions/checkout@v4
+
+      - name: Checkout ComitasBotJ
+        uses: actions/checkout@v4
+        with:
+          repository: TheHSI-HQ/ComitasBotJ
+          path: ComitasBotJ
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      - name: Build ComitasBotJ dependencies
+        working-directory: ComitasBotJ
+        run: mvn -pl comitas-api -am clean install -DskipTests
+
+      - name: Build all Maven projects
+        shell: bash
+        run: |
+          while IFS= read -r -d '' pom; do
+            dir="$(dirname "$pom")"
+
+            # Skip the cloned ComitasBotJ repository
+            if [[ "$dir" == "./ComitasBotJ" || "$dir" == "./ComitasBotJ/"* ]]; then
+              continue
+            fi
+
+            echo "Building $dir"
+            (
+              cd "$dir"
+              mvn package
+            )
+          done < <(find . -name pom.xml -print0)
+
+      - name: Upload all plugin artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugins
+          path: |
+            **/target/*.jar
+            !ComitasBotJ/**
+          if-no-files-found: error
