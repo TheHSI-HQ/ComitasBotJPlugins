@@ -12,6 +12,7 @@ import cloud.thehsi.ComitasBotJ.API.Plugin.Plugin;
 import cloud.thehsi.ReactionRoles.Main;
 
 public record ReactionListener(Main plugin) implements Listener {
+   @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.NORMAL)
     public void onReaction(ReactionUpdatedEvent event) {
         // Do not react to our own reaction events.
@@ -46,9 +47,9 @@ public record ReactionListener(Main plugin) implements Listener {
             return;
         }
 
-        if (event.reactionAction().isIncrease()) {
+        if (event.reactionAction().isRemoved()) {
             event.member().addRole(role);
-        } else if (event.reactionAction().isDecrease() || event.reactionAction().isRemoved()) {
+        } else if (event.reactionAction().isDecrease()) {
             event.member().removeRole(role);
         }
     }

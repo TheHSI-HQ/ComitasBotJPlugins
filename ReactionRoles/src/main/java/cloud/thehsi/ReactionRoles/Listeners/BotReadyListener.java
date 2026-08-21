@@ -7,6 +7,7 @@ import cloud.thehsi.ComitasBotJ.API.Event.Listener;
 import cloud.thehsi.ReactionRoles.Main;
 
 public record BotReadyListener(Main plugin) implements Listener {
+    @SuppressWarnings("unused")
     @EventHandler(priority = EventPriority.LOW)
     public void onBotReady(BotReadyEvent event) {
         try {
