@@ -32,29 +32,30 @@ jobs:
         working-directory: ComitasBotJ
         run: mvn -pl comitas-api -am clean install -DskipTests
 
-      - name: Build all Maven projects
+      - name: Build all direct Maven projects
         shell: bash
         run: |
-          while IFS= read -r -d '' pom; do
+          for pom in */pom.xml; do
             dir="$(dirname "$pom")"
-
-            # Skip the cloned ComitasBotJ repository
-            if [[ "$dir" == "./ComitasBotJ" || "$dir" == "./ComitasBotJ/"* ]]; then
-              continue
-            fi
 
             echo "Building $dir"
             (
               cd "$dir"
               mvn package
             )
-          done < <(find . -name pom.xml -print0)
+          done
+
+      - name: Collect plugin artifacts
+        shell: bash
+        run: |
+          mkdir -p artifacts
+
+          find */target -maxdepth 1 -type f -name '*.jar' \
+            -exec cp {} artifacts/ \;
 
       - name: Upload all plugin artifacts
         uses: actions/upload-artifact@v4
         with:
           name: plugins
-          path: |
-            **/target/*.jar
-            !ComitasBotJ/**
+          path: artifacts/*.jar
           if-no-files-found: error
