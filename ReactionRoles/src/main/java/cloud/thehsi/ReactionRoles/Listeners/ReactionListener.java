@@ -47,7 +47,7 @@ public record ReactionListener(Main plugin) implements Listener {
             return;
         }
 
-        if (event.reactionAction().isRemoved()) {
+        if (event.reactionAction().isIncrease()) {
             event.member().addRole(role);
         } else if (event.reactionAction().isDecrease()) {
             event.member().removeRole(role);

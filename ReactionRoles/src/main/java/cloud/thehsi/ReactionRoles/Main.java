@@ -68,7 +68,8 @@ public final class Main extends Plugin {
         Message existing = null;
 
         if (storage.has(MESSAGE_ID_KEY, PersistentDataTypes.LONG)) {
-            long savedId = storage.get(MESSAGE_ID_KEY, PersistentDataTypes.LONG);
+            Long savedId = storage.get(MESSAGE_ID_KEY, PersistentDataTypes.LONG);
+            assert savedId != null;
             try {
                 existing = messageChannel.getMessageById(savedId);
             } catch (RuntimeException ex) {
